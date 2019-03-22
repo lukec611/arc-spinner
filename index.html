@@ -1,0 +1,127 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body{
+                margin: 0;
+                padding: 1em;
+                box-sizing: border-box;
+            }
+            @keyframes spinning {
+                from { transform: rotateZ(0deg); }
+                to { transform: rotateZ(360deg); }
+            }
+            .container{
+                max-width: 500px;
+                width: 100%;
+                border: 5px dashed turquoise;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                overflow: hidden;
+                margin-bottom: 1em;
+                padding: 1em;
+                box-sizing: border-box;
+            }
+            svg{
+                animation-name: spinning;
+                animation-duration: 1s;
+                animation-iteration-count: infinite;
+                animation-timing-function: linear;
+                width: 100%;
+                height: auto;
+                /* background-color: green; */
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <svg viewBox="0 0 100 100">
+                <!-- <circle cx="25" cy="25" r="25" fill="blue" />
+                <circle cx="50" cy="50" r="25" fill="red" /> -->
+                <!-- <path d="M 0 0 L 25 50 l 25 -25 z" stroke="pink" fill="green" /> -->
+                <!-- <path d="M 0 0 L 25 50 Q 60 60 50 25 z" stroke="pink" fill="green" />
+                <path d="M 50 50 L 50 100 L 100 50 z" stroke="yellow" fill="green" />
+                <path d="M 50 50 L 50 100 A 50 50 0 0 0 100 50 z" stroke="white" fill="black" /> -->
+    
+            </svg>
+        </div>
+        <div class="container">
+            <div>
+                <label>
+                    <span>
+                        colors:
+                    </span>
+                    <input value="4" type="number" oninput="change(event)" />
+                </label>
+            </div>
+        </div>
+
+
+        <script>
+
+            // degree: number (degrees)
+            function getPoint(degree) {
+                const radians = -degree / 57.3;
+                return {
+                    x: Math.cos(radians) * 50 + 50,
+                    y: Math.sin(radians) * 50 + 50,
+                };
+            }
+        
+            function appendArc(degreeStart, degreeEnd, fillColor) {
+                const svgElement = document.querySelector('svg');
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttributeNS(null, 'fill', fillColor);
+                const p1 = getPoint(degreeStart);
+                const p2 = getPoint(degreeEnd);
+                path.setAttributeNS(null, 'd', `M 50 50 L ${p1.x} ${p1.y} A 50 50 0 0 0 ${p2.x} ${p2.y} z`);
+                svgElement.appendChild(path);
+            }
+
+            function randomColor() {
+                const rN = () => Math.random() * 155 + 100;
+                return `rgb(${rN()},${rN()},${rN()})`;
+            }
+
+            function clearAndDraw(numberOfSlices) {
+                const degreesPerSlice = 360 / numberOfSlices;
+                const svgElement = document.querySelector('svg');
+                svgElement.innerHTML = '';
+
+                for(let i = 0; i < numberOfSlices; i++) {
+                    appendArc(i * degreesPerSlice, i * degreesPerSlice + degreesPerSlice, randomColor());
+                }
+            }
+
+            async function clearAndAnimate(numberOfSlices) {
+                const degreesPerSlice = 360 / numberOfSlices;
+                const msToWait = 1000 / numberOfSlices;
+                const svgElement = document.querySelector('svg');
+                svgElement.innerHTML = '';
+                // x: number - milliseconds
+                const delay = x => new Promise(r => setTimeout(r, x));
+
+                await delay(msToWait);
+
+                for(let i = 0; i < numberOfSlices; i++) {
+                    appendArc(i * degreesPerSlice, i * degreesPerSlice + degreesPerSlice, randomColor());
+                    await delay(msToWait);
+                }
+
+            }
+
+            
+            function change(event) {
+                const input = Number(event.target.value);
+                const newValue = input >= 3 ? input : 1;
+                numberOfSlices = newValue;
+                clearAndAnimate(numberOfSlices);
+            }
+
+            clearAndAnimate(5);
+
+        </script>
+
+    </body>
+</html>
